@@ -1,0 +1,1060 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ISSUE: Title is vague - should be more descriptive -->
+    <title>Test Page</title>
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+
+        /* ===== ISSUE: Poor color contrast - light gray text on white ===== */
+        .low-contrast-text {
+            color: #aaaaaa;
+            background: #ffffff;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        /* ===== ISSUE: Very low contrast - yellow text on white ===== */
+        .very-low-contrast {
+            color: #ffcc00;
+            background: #ffffff;
+            font-size: 14px;
+            padding: 8px;
+        }
+
+        /* ===== ISSUE: Focus outline removed ===== */
+        .no-focus-outline:focus {
+            outline: none;
+        }
+
+        /* ===== ISSUE: Custom focus style that is barely visible ===== */
+        .poor-focus:focus {
+            outline: 1px dotted #cccccc;
+        }
+
+        /* Good contrast for comparison */
+        .good-contrast {
+            color: #1a1a1a;
+            background: #ffffff;
+            padding: 10px;
+            border: 1px solid #333;
+        }
+
+        /* Layout */
+        .section {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .issue-label {
+            background: #ff4444;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+
+        .ok-label {
+            background: #22aa44;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td, th {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .form-row {
+            margin-bottom: 12px;
+        }
+
+        input[type="text"], input[type="email"], select, textarea {
+            padding: 6px 10px;
+            border: 1px solid #999;
+            border-radius: 3px;
+            font-size: 14px;
+            width: 250px;
+        }
+
+        button {
+            padding: 8px 16px;
+            margin: 4px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #0066cc;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #cc0000;
+            color: white;
+        }
+
+        /* ISSUE: Non-interactive div styled as button */
+        .fake-button {
+            display: inline-block;
+            background: #888;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 4px;
+        }
+
+        /* ISSUE: Link styled to look like regular text */
+        .invisible-link {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .toc {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .toc ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .toc li {
+            margin: 4px 0;
+        }
+
+        img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        .img-placeholder {
+            width: 200px;
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .decorative-img {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 50%;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== PAGE HEADER ===== -->
+    <!-- ISSUE: Using <div> instead of <header> semantic element -->
+    <div id="page-header" style="background:#003366; color:white; padding:20px; margin-bottom:20px;">
+        <!-- ISSUE: Logo image has no alt text -->
+        <span class="decorative-img" role="img" style="vertical-align:middle; margin-right:10px;"></span>
+        <!-- ISSUE: Skipping H1, starting with H2 -->
+        <h2 style="display:inline; color:white;">WCAG 2.1 Accessibility Test Page</h2>
+        <p style="color:#aaccff; margin:5px 0 0 0; font-size:13px;">For testing accessibility checking tools</p>
+    </div>
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="toc">
+        <strong>Jump to Section:</strong>
+        <ul>
+            <li><a href="#color-contrast">Color Contrast</a></li>
+            <li><a href="#form-labels">Form Labels</a></li>
+            <li><a href="#aria-section">ARIA Attributes</a></li>
+            <li><a href="#headings-section">Heading Structure</a></li>
+            <li><a href="#images-section">Alt Text / Images</a></li>
+            <li><a href="#keyboard-section">Keyboard Navigation</a></li>
+            <li><a href="#focus-section">Focus Management</a></li>
+            <li><a href="#lists-section">Lists</a></li>
+            <li><a href="#tables-section">Tables</a></li>
+            <li><a href="#links-section">Links</a></li>
+        </ul>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 1: COLOR CONTRAST                                    -->
+    <!-- ============================================================ -->
+    <div class="section" id="color-contrast">
+        <h2>1. Color Contrast <span class="issue-label">ISSUES PRESENT</span></h2>
+        <p>WCAG 2.1 SC 1.4.3 — Minimum contrast ratio 4.5:1 for normal text, 3:1 for large text.</p>
+
+        <!-- ISSUE: Gray on white - ratio ~2.3:1 -->
+        <div class="low-contrast-text">
+            <strong>❌ FAIL:</strong> This gray text (#aaa) on white background has a contrast ratio of ~2.3:1 — fails WCAG AA.
+        </div>
+
+        <!-- ISSUE: Yellow on white - ratio ~1.07:1 -->
+        <div class="very-low-contrast" style="margin-top:10px;">
+            <strong>❌ FAIL:</strong> This yellow text (#ffcc00) on white is nearly invisible — contrast ratio ~1.07:1.
+        </div>
+
+        <!-- ISSUE: Light blue on white -->
+        <div style="color:#66aaff; background:#ffffff; padding:10px; margin-top:10px; border:1px solid #eee;">
+            <strong>❌ FAIL:</strong> Light blue (#66aaff) on white — contrast ratio ~2.9:1, fails AA for normal text.
+        </div>
+
+        <!-- GOOD EXAMPLE -->
+        <div class="good-contrast" style="margin-top:10px;">
+            <strong>✅ PASS:</strong> Dark text (#1a1a1a) on white — contrast ratio ~18:1, passes WCAG AAA.
+        </div>
+
+        <!-- ISSUE: White text on light background -->
+        <div style="background:#dddddd; color:#ffffff; padding:10px; margin-top:10px;">
+            <strong>❌ FAIL:</strong> White text on light gray (#ddd) — contrast ratio ~1.2:1.
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 2: FORM LABELS                                       -->
+    <!-- ============================================================ -->
+    <div class="section" id="form-labels">
+        <h2>2. Form Labels <span class="issue-label">ISSUES PRESENT</span></h2>
+        <p>WCAG 2.1 SC 1.3.1, 3.3.2 — All form inputs must have associated labels.</p>
+
+        <!-- ISSUE: Input with no label at all -->
+        <div class="form-row">
+            <span>❌ No label:</span>
+            <input type="text" placeholder="Enter your name" />
+        </div>
+
+        <!-- ISSUE: Label not associated via for/id -->
+        <div class="form-row">
+            <label>❌ Unassociated label: </label>
+            <input type="email" placeholder="Enter email" />
+        </div>
+
+        <!-- ISSUE: Placeholder used as label substitute -->
+        <div class="form-row">
+            <input type="text" placeholder="❌ Placeholder as label (no real label)" style="width:300px;" />
+        </div>
+
+        <!-- GOOD: Properly associated label -->
+        <div class="form-row">
+            <label for="good-name">✅ Full Name (properly labeled):</label><br/>
+            <input type="text" id="good-name" name="fullname" />
+        </div>
+
+        <!-- GOOD: aria-label on input -->
+        <div class="form-row">
+            <input type="text" aria-label="✅ Search with aria-label" placeholder="Search..." />
+        </div>
+
+        <!-- ISSUE: Select with no label -->
+        <div class="form-row">
+            <span>❌ Select with no label:</span>
+            <select>
+                <option>Option A</option>
+                <option>Option B</option>
+                <option>Option C</option>
+            </select>
+        </div>
+
+        <!-- GOOD: Select with label -->
+        <div class="form-row">
+            <label for="good-select">✅ Country (labeled select):</label><br/>
+            <select id="good-select">
+                <option>Canada</option>
+                <option>United States</option>
+                <option>United Kingdom</option>
+            </select>
+        </div>
+
+        <!-- ISSUE: Textarea with no label -->
+        <div class="form-row">
+            <span>❌ Textarea with no label:</span><br/>
+            <textarea rows="3" style="width:300px;" placeholder="Comments..."></textarea>
+        </div>
+
+        <!-- ISSUE: Required field not indicated -->
+        <div class="form-row">
+            <label for="req-field">❌ Required field (no indication):</label><br/>
+            <input type="text" id="req-field" />
+        </div>
+
+        <!-- GOOD: Required field properly marked -->
+        <div class="form-row">
+            <label for="req-good">✅ Required field: <span aria-hidden="true" style="color:red;">*</span><span class="sr-only"> (required)</span></label><br/>
+            <input type="text" id="req-good" required aria-required="true" />
+        </div>
+
+        <!-- Radio buttons -->
+        <fieldset style="border:1px solid #ccc; padding:10px; margin-top:10px;">
+            <!-- ISSUE: Fieldset with no legend -->
+            <p>❌ Radio group with no fieldset legend:</p>
+            <input type="radio" name="bad-radio" id="r1" value="yes" />
+            <label for="r1">Yes</label>
+            <input type="radio" name="bad-radio" id="r2" value="no" />
+            <label for="r2">No</label>
+        </fieldset>
+
+        <fieldset style="border:1px solid #ccc; padding:10px; margin-top:10px;">
+            <legend>✅ Preferred Contact Method (with legend):</legend>
+            <div>
+                <input type="radio" name="contact" id="contact-email" value="email" />
+                <label for="contact-email">Email</label>
+            </div>
+            <div>
+                <input type="radio" name="contact" id="contact-phone" value="phone" />
+                <label for="contact-phone">Phone</label>
+            </div>
+            <div>
+                <input type="radio" name="contact" id="contact-mail" value="mail" />
+                <label for="contact-mail">Mail</label>
+            </div>
+        </fieldset>
+
+        <!-- Checkboxes -->
+        <div style="margin-top:10px;">
+            <p>❌ Checkboxes with no labels:</p>
+            <input type="checkbox" /> Option 1
+            <input type="checkbox" /> Option 2
+            <input type="checkbox" /> Option 3
+        </div>
+
+        <div style="margin-top:10px;">
+            <p>✅ Checkboxes with proper labels:</p>
+            <div><input type="checkbox" id="chk1" /><label for="chk1"> Subscribe to newsletter</label></div>
+            <div><input type="checkbox" id="chk2" /><label for="chk2"> Accept terms and conditions</label></div>
+        </div>
+
+        <!-- Submit buttons -->
+        <div style="margin-top:15px;">
+            <!-- ISSUE: Button with no text -->
+            <button class="btn-primary" aria-label="">❌</button>
+            <!-- ISSUE: Generic button text -->
+            <button class="btn-primary">Submit</button>
+            <!-- GOOD: Descriptive button -->
+            <button class="btn-primary">✅ Submit Registration Form</button>
+            <!-- ISSUE: Input type submit with no value -->
+            <input type="submit" />
+            <!-- GOOD: Input type submit with value -->
+            <input type="submit" value="✅ Send Message" style="padding:8px 16px; background:#0066cc; color:white; border:none; border-radius:4px; cursor:pointer;" />
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 3: ARIA ATTRIBUTES                                   -->
+    <!-- ============================================================ -->
+    <div class="section" id="aria-section">
+        <h2>3. ARIA Attributes <span class="issue-label">ISSUES PRESENT</span></h2>
+        <p>WCAG 2.1 SC 4.1.2 — ARIA roles, states, and properties must be valid and correctly used.</p>
+
+        <!-- ISSUE: Invalid ARIA role -->
+        <div role="button-group" style="margin-bottom:10px;">
+            <span>❌ Invalid ARIA role="button-group"</span>
+        </div>
+
+        <!-- ISSUE: aria-label on non-interactive element -->
+        <p aria-label="This label is redundant on a paragraph">
+            ❌ aria-label on a &lt;p&gt; element (unnecessary/incorrect usage).
+        </p>
+
+        <!-- ISSUE: aria-hidden on focusable element -->
+        <button aria-hidden="true" style="margin:5px;">❌ aria-hidden="true" on a focusable button</button>
+
+        <!-- ISSUE: Missing aria-expanded on toggle -->
+        <button id="toggle-btn" onclick="toggleContent()" style="margin:5px;">
+            ❌ Toggle (missing aria-expanded)
+        </button>
+        <div id="toggle-content" style="display:none; padding:10px; background:#f0f0f0;">
+            Hidden content revealed on toggle.
+        </div>
+
+        <!-- GOOD: Correct aria-expanded -->
+        <button id="good-toggle-btn" aria-expanded="false" aria-controls="good-toggle-content" onclick="goodToggle()" style="margin:5px;">
+            ✅ Toggle (with aria-expanded)
+        </button>
+        <div id="good-toggle-content" style="display:none; padding:10px; background:#e8f5e9;">
+            ✅ Properly managed toggle content.
+        </div>
+
+        <!-- ISSUE: Role="presentation" on interactive element -->
+        <table role="presentation" style="margin-top:10px; width:auto;">
+            <tr>
+                <td>❌ role="presentation" on a data table removes semantics</td>
+            </tr>
+        </table>
+
+        <!-- ISSUE: aria-describedby pointing to non-existent ID -->
+        <div class="form-row">
+            <label for="aria-bad">❌ Input with broken aria-describedby:</label><br/>
+            <input type="text" id="aria-bad" aria-describedby="nonexistent-id" />
+        </div>
+
+        <!-- GOOD: aria-describedby correctly used -->
+        <div class="form-row">
+            <label for="aria-good">✅ Password (with aria-describedby):</label><br/>
+            <input type="password" id="aria-good" aria-describedby="pwd-hint" />
+            <div id="pwd-hint" style="font-size:12px; color:#555; margin-top:4px;">Must be at least 8 characters, including a number.</div>
+        </div>
+
+        <!-- ISSUE: Live region without role -->
+        <div id="status-bad" style="margin-top:10px; padding:8px; background:#fff3cd; border:1px solid #ffc107;">
+            ❌ Status message area (no aria-live or role="status")
+        </div>
+
+        <!-- GOOD: Live region -->
+        <div id="status-good" role="status" aria-live="polite" style="margin-top:10px; padding:8px; background:#d4edda; border:1px solid #28a745;">
+            ✅ Status message area with role="status" and aria-live="polite"
+        </div>
+
+        <!-- ISSUE: Tooltip without proper ARIA -->
+        <span style="position:relative; display:inline-block; margin-top:10px;">
+            <button style="margin:5px;">❌ Hover for tooltip</button>
+            <span style="position:absolute; bottom:100%; left:0; background:#333; color:white; padding:4px 8px; border-radius:3px; white-space:nowrap; font-size:12px;">
+                Tooltip without aria-describedby
+            </span>
+        </span>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 4: HEADING STRUCTURE                                 -->
+    <!-- ============================================================ -->
+    <div class="section" id="headings-section">
+        <h2>4. Heading Structure <span class="issue-label">ISSUES PRESENT</span></h2>
+        <p>WCAG 2.1 SC 1.3.1, 2.4.6 — Headings must be logical and hierarchical.</p>
+
+        <!-- ISSUE: Skipping heading levels -->
+        <h2>Section Title (H2)</h2>
+        <!-- ISSUE: Skipped H3, jumped to H4 -->
+        <h4>❌ Subsection (H4 — skipped H3!)</h4>
+        <p>This skips heading level H3, which breaks logical hierarchy.</p>
+
+        <!-- ISSUE: Heading used for styling, not structure -->
+        <h1 style="font-size:14px; font-weight:normal;">❌ H1 used for small decorative text (wrong level, wrong purpose)</h1>
+
+        <!-- ISSUE: Non-heading styled to look like heading -->
+        <p style="font-size:22px; font-weight:bold; margin:10px 0;">❌ Bold large paragraph pretending to be a heading</p>
+
+        <!-- GOOD: Proper heading hierarchy -->
+        <h3>✅ Proper H3 Subsection</h3>
+        <p>This follows logically from an H2 parent.</p>
+        <h4>✅ Proper H4 Sub-subsection</h4>
+        <p>This follows logically from an H3 parent.</p>
+
+        <!-- ISSUE: Multiple H1s on page (already have one above in header) -->
+        <h1>❌ Second H1 on the page (should only be one H1)</h1>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 5: ALT TEXT / IMAGES                                 -->
+    <!-- ============================================================ -->
+    <div class="section" id="images-section">
+        <h2>5. Alt Text / Images <span class="issue-label">ISSUES PRESENT</span></h2>
+        <p>WCAG 2.1 SC 1.1.1 — All non-decorative images must have descriptive alt text.</p>
+
+        <div style="display:flex; flex-wrap:wrap; gap:15px; align-items:flex-start;">
+
+            <!-- ISSUE: Missing alt attribute entirely -->
+            <div>
+                <p>❌ Missing alt attribute:</p>
+                <div class="img-placeholder">
+                    <!-- Simulated img with no alt -->
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120'%3E%3Crect width='200' height='120' fill='%23667eea'/%3E%3Ctext x='50%25' y='50%25' fill='white' text-anchor='middle' dy='.3em' font-family='Arial' font-size='14'%3EChart Image%3C/text%3E%3C/svg%3E" />
+                </div>
+            </div>
+
+            <!-- ISSUE: Empty alt on informative image -->
+            <div>
+                <p>❌ Empty alt="" on informative image:</p>
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120'%3E%3Crect width='200' height='120' fill='%23764ba2'/%3E%3Ctext x='50%25' y='50%25' fill='white' text-anchor='middle' dy='.3em' font-family='Arial' font-size='14'%3ESales Chart%3C/text%3E%3C/svg%3E" alt="" />
+            </div>
+
+            <!-- ISSUE: Non-descriptive alt text -->
+            <div>
+                <p>❌ Non-descriptive alt="image":</p>
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120'%3E%3Crect width='200' height='120' fill='%23f5576c'/%3E%3Ctext x='50%25' y='50%25' fill='white' text-anchor='middle' dy='.3em' font-family='Arial' font-size='14'%3EBar Graph%3C/text%3E%3C/svg%3E" alt="image" />
+            </div>
+
+            <!-- ISSUE: Filename as alt text -->
+            <div>
+                <p>❌ Filename as alt text:</p>
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120'%3E%3Crect width='200' height='120' fill='%23f093fb'/%3E%3Ctext x='50%25' y='50%25' fill='white' text-anchor='middle' dy='.3em' font-family='Arial' font-size='14'%3EPie Chart%3C/text%3E%3C/svg%3E" alt="img_20240513_chart.png" />
+            </div>
+
+            <!-- GOOD: Descriptive alt text -->
+            <div>
+                <p>✅ Descriptive alt text:</p>
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120'%3E%3Crect width='200' height='120' fill='%2328a745'/%3E%3Ctext x='50%25' y='50%25' fill='white' text-anchor='middle' dy='.3em' font-family='Arial' font-size='11'%3EQ1 Revenue Chart%3C/text%3E%3C/svg%3E" alt="Bar chart showing Q1 2026 revenue by region: East $2.1M, West $1.8M, North $1.2M" />
+            </div>
+
+            <!-- GOOD: Decorative image with empty alt -->
+            <div>
+                <p>✅ Decorative image (alt="" is correct):</p>
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='30' cy='30' r='30' fill='%23ffc107'/%3E%3C/svg%3E" alt="" role="presentation" />
+                <p style="font-size:12px; color:#555;">Decorative divider star — alt="" is correct here.</p>
+            </div>
+
+        </div>
+
+        <!-- ISSUE: Image used as link with no alt -->
+        <div style="margin-top:15px;">
+            <p>❌ Image link with no alt text:</p>
+            <a href="#">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='40'%3E%3Crect width='120' height='40' fill='%230066cc'/%3E%3Ctext x='50%25' y='50%25' fill='white' text-anchor='middle' dy='.3em' font-family='Arial' font-size='13'%3EClick Here%3C/text%3E%3C/svg%3E" alt="" />
+            </a>
+        </div>
+
+        <!-- GOOD: Image link with descriptive alt -->
+        <div style="margin-top:10px;">
+            <p>✅ Image link with descriptive alt:</p>
+            <a href="#">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='40'%3E%3Crect width='120' height='40' fill='%2328a745'/%3E%3Ctext x='50%25' y='50%25' fill='white' text-anchor='middle' dy='.3em' font-family='Arial' font-size='13'%3EHome Page%3C/text%3E%3C/svg%3E" alt="Go to Home Page" />
+            </a>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 6: KEYBOARD NAVIGATION                               -->
+    <!-- ============================================================ -->
+    <div class="section" id="keyboard-section">
+        <h2>6. Keyboard Navigation <span class="issue-label">ISSUES PRESENT</span></h2>
+        <p>WCAG 2.1 SC 2.1.1 — All functionality must be accessible via keyboard.</p>
+
+        <!-- ISSUE: div used as button (not keyboard accessible) -->
+        <div class="fake-button" onclick="alert('Clicked!')">
+            ❌ Div-button (not keyboard accessible, no tabindex, no role)
+        </div>
+
+        <!-- ISSUE: span used as interactive control -->
+        <span onclick="alert('Span clicked!')" style="cursor:pointer; color:#0066cc; text-decoration:underline; margin:8px;">
+            ❌ Span as interactive link (no keyboard access)
+        </span>
+
+        <!-- ISSUE: tabindex=-1 on interactive element -->
+        <button tabindex="-1" style="margin:4px;">❌ tabindex="-1" (removed from tab order)</button>
+
+        <!-- ISSUE: Positive tabindex disrupts natural order -->
+        <div style="margin:10px 0;">
+            <button tabindex="3" style="margin:4px;">❌ tabindex="3" (Tab 3rd)</button>
+            <button tabindex="1" style="margin:4px;">❌ tabindex="1" (Tab 1st)</button>
+            <button tabindex="2" style="margin:4px;">❌ tabindex="2" (Tab 2nd)</button>
+            <p style="font-size:12px; color:#555;">Positive tabindex values disrupt natural reading/tab order.</p>
+        </div>
+
+        <!-- GOOD: Div with role=button and tabindex=0 -->
+        <div role="button" tabindex="0" 
+             onclick="this.textContent='✅ Activated!'" 
+             onkeydown="if(event.key==='Enter'||event.key===' '){this.textContent='✅ Activated!';}"
+             style="display:inline-block; background:#0066cc; color:white; padding:8px 16px; border-radius:4px; cursor:pointer; margin:4px;">
+            ✅ Div-button (role=button, tabindex=0, keyboard handler)
+        </div>
+
+        <!-- GOOD: Native button -->
+        <button class="btn-primary" style="margin:4px;" onclick="this.textContent='✅ Clicked!'">
+            ✅ Native &lt;button&gt; element
+        </button>
+
+        <!-- ISSUE: Mouse-only event (no keyboard equivalent) -->
+        <div style="margin-top:10px; padding:10px; background:#fff3cd; border:1px solid #ffc107;">
+            <p>❌ Mouse-only interaction (onmouseover only):</p>
+            <div onmouseover="document.getElementById('mouse-only-msg').style.display='block'" 
+                 onmouseout="document.getElementById('mouse-only-msg').style.display='none'"
+                 style="display:inline-block; background:#888; color:white; padding:8px 16px; border-radius:4px; cursor:default;">
+                Hover over me
+            </div>
+            <div id="mouse-only-msg" style="display:none; margin-top:5px; padding:8px; background:#333; color:white; border-radius:4px;">
+                Mouse-only tooltip — keyboard users cannot access this!
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 7: FOCUS MANAGEMENT                                  -->
+    <!-- ============================================================ -->
+    <div class="section" id="focus-section">
+        <h2>7. Focus Management <span class="issue-label">ISSUES PRESENT</span></h2>
+        <p>WCAG 2.1 SC 2.4.7 — Focus must be visible. SC 2.4.3 — Focus order must be logical.</p>
+
+        <!-- ISSUE: No focus outline -->
+        <button class="btn-primary no-focus-outline" style="margin:4px;">
+            ❌ No focus outline (outline:none)
+        </button>
+
+        <!-- ISSUE: Poor focus indicator -->
+        <button class="btn-primary poor-focus" style="margin:4px;">
+            ❌ Poor focus indicator (1px dotted #ccc)
+        </button>
+
+        <!-- GOOD: Visible focus -->
+        <button class="btn-primary" style="margin:4px;">
+            ✅ Default focus (browser default outline)
+        </button>
+
+        <!-- GOOD: Custom high-contrast focus -->
+        <button style="margin:4px; padding:8px 16px; background:#0066cc; color:white; border:none; border-radius:4px; cursor:pointer;"
+                onfocus="this.style.outline='3px solid #ff6600'; this.style.outlineOffset='2px';"
+                onblur="this.style.outline='';">
+            ✅ Custom high-contrast focus (orange, 3px)
+        </button>
+
+        <!-- ISSUE: Focus trap (modal without proper management) -->
+        <div style="margin-top:15px;">
+            <button onclick="document.getElementById('bad-modal').style.display='block';" style="margin:4px;">
+                ❌ Open Bad Modal (no focus trap)
+            </button>
+            <div id="bad-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; border:2px solid #ccc; padding:20px; z-index:1000; width:300px; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+                <h3>❌ Modal Without Focus Management</h3>
+                <p>Focus is not trapped. Background content is still reachable by keyboard.</p>
+                <input type="text" placeholder="Input in modal" style="width:100%; margin-bottom:10px;" />
+                <button onclick="document.getElementById('bad-modal').style.display='none';">Close</button>
+            </div>
+        </div>
+
+        <!-- GOOD: Modal with focus management -->
+        <div style="margin-top:10px;">
+            <button onclick="openGoodModal();" style="margin:4px;">
+                ✅ Open Good Modal (with focus management)
+            </button>
+            <div id="good-modal" role="dialog" aria-modal="true" aria-labelledby="good-modal-title" 
+                 style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; border:2px solid #0066cc; padding:20px; z-index:1001; width:300px; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+                <h3 id="good-modal-title">✅ Accessible Modal</h3>
+                <p>Focus is managed correctly. Press Escape to close.</p>
+                <input type="text" id="modal-input" placeholder="Input in modal" style="width:100%; margin-bottom:10px;" />
+                <button onclick="closeGoodModal();">Close Modal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 8: LISTS                                             -->
+    <!-- ============================================================ -->
+    <div class="section" id="lists-section">
+        <h2>8. Lists <span class="issue-label">ISSUES PRESENT</span></h2>
+        <p>WCAG 2.1 SC 1.3.1 — Lists must use proper semantic markup.</p>
+
+        <!-- ISSUE: Fake list using divs/spans -->
+        <p>❌ Fake list using divs:</p>
+        <div>• Item one</div>
+        <div>• Item two</div>
+        <div>• Item three</div>
+
+        <!-- ISSUE: Fake list using line breaks -->
+        <p>❌ Fake list using &lt;br&gt; tags:</p>
+        <p>
+            - Apple<br/>
+            - Banana<br/>
+            - Cherry
+        </p>
+
+        <!-- ISSUE: List items outside of list element -->
+        <p>❌ &lt;li&gt; without parent &lt;ul&gt; or &lt;ol&gt;:</p>
+        <li>Orphaned list item 1</li>
+        <li>Orphaned list item 2</li>
+
+        <!-- ISSUE: Nested list without proper parent -->
+        <ul>
+            <li>Parent item 1</li>
+            <!-- ISSUE: li directly containing another li without ul/ol wrapper -->
+            <li>Parent item 2
+                <li>❌ Nested li without ul/ol wrapper</li>
+            </li>
+        </ul>
+
+        <!-- GOOD: Proper unordered list -->
+        <p>✅ Proper unordered list:</p>
+        <ul>
+            <li>Apple</li>
+            <li>Banana</li>
+            <li>Cherry</li>
+        </ul>
+
+        <!-- GOOD: Proper ordered list -->
+        <p>✅ Proper ordered list:</p>
+        <ol>
+            <li>First step: Open application</li>
+            <li>Second step: Log in with credentials</li>
+            <li>Third step: Navigate to dashboard</li>
+        </ol>
+
+        <!-- GOOD: Proper nested list -->
+        <p>✅ Proper nested list:</p>
+        <ul>
+            <li>Fruits
+                <ul>
+                    <li>Citrus
+                        <ul>
+                            <li>Orange</li>
+                            <li>Lemon</li>
+                        </ul>
+                    </li>
+                    <li>Berries</li>
+                </ul>
+            </li>
+            <li>Vegetables</li>
+        </ul>
+
+        <!-- GOOD: Description list -->
+        <p>✅ Proper description list:</p>
+        <dl>
+            <dt>WCAG</dt>
+            <dd>Web Content Accessibility Guidelines</dd>
+            <dt>ARIA</dt>
+            <dd>Accessible Rich Internet Applications</dd>
+        </dl>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 9: TABLES                                            -->
+    <!-- ============================================================ -->
+    <div class="section" id="tables-section">
+        <h2>9. Tables <span class="issue-label">ISSUES PRESENT</span></h2>
+        <p>WCAG 2.1 SC 1.3.1 — Data tables must have proper headers and structure.</p>
+
+        <!-- ISSUE: Table used for layout -->
+        <p>❌ Table used for layout (not data):</p>
+        <table>
+            <tr>
+                <td style="width:50%; padding:10px; background:#f8f8f8;">Left column content</td>
+                <td style="width:50%; padding:10px; background:#f0f0f0;">Right column content</td>
+            </tr>
+        </table>
+
+        <!-- ISSUE: Data table with no headers -->
+        <p>❌ Data table with no &lt;th&gt; headers:</p>
+        <table>
+            <tr>
+                <td>John Smith</td>
+                <td>john@example.com</td>
+                <td>Manager</td>
+            </tr>
+            <tr>
+                <td>Jane Doe</td>
+                <td>jane@example.com</td>
+                <td>Developer</td>
+            </tr>
+        </table>
+
+        <!-- ISSUE: Table with headers but no scope -->
+        <p>❌ Table headers without scope attribute:</p>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+            </tr>
+            <tr>
+                <td>Alice Brown</td>
+                <td>alice@example.com</td>
+                <td>Designer</td>
+            </tr>
+        </table>
+
+        <!-- ISSUE: Complex table with no id/headers association -->
+        <p>❌ Complex table without proper header association:</p>
+        <table>
+            <tr>
+                <th colspan="2">Q1 Sales</th>
+                <th colspan="2">Q2 Sales</th>
+            </tr>
+            <tr>
+                <th>Region</th>
+                <th>Amount</th>
+                <th>Region</th>
+                <th>Amount</th>
+            </tr>
+            <tr>
+                <td>East</td>
+                <td>$2.1M</td>
+                <td>East</td>
+                <td>$2.4M</td>
+            </tr>
+        </table>
+
+        <!-- GOOD: Properly structured table -->
+        <p>✅ Properly structured data table:</p>
+        <table>
+            <caption>Employee Directory — Engineering Department</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Department</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>John Smith</td>
+                    <td>john@example.com</td>
+                    <td>Senior Developer</td>
+                    <td>Engineering</td>
+                </tr>
+                <tr>
+                    <td>Jane Doe</td>
+                    <td>jane@example.com</td>
+                    <td>UX Designer</td>
+                    <td>Design</td>
+                </tr>
+                <tr>
+                    <td>Bob Wilson</td>
+                    <td>bob@example.com</td>
+                    <td>QA Engineer</td>
+                    <td>Quality</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" style="font-style:italic; color:#555;">Total: 3 employees listed</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- GOOD: Row headers table -->
+        <p>✅ Table with both column and row headers:</p>
+        <table>
+            <caption>Monthly Revenue by Product (in $000s)</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">January</th>
+                    <th scope="col">February</th>
+                    <th scope="col">March</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">Product A</th>
+                    <td>$120</td>
+                    <td>$135</td>
+                    <td>$142</td>
+                </tr>
+                <tr>
+                    <th scope="row">Product B</th>
+                    <td>$98</td>
+                    <td>$110</td>
+                    <td>$125</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 10: LINKS                                            -->
+    <!-- ============================================================ -->
+    <div class="section" id="links-section">
+        <h2>10. Links <span class="issue-label">ISSUES PRESENT</span></h2>
+        <p>WCAG 2.1 SC 2.4.4 — Link purpose must be determinable from link text or context.</p>
+
+        <!-- ISSUE: Generic "click here" links -->
+        <p>❌ Generic link text:</p>
+        <ul>
+            <li>To read our privacy policy, <a href="#">click here</a>.</li>
+            <li>Download the report: <a href="#">here</a></li>
+            <li><a href="#">Read more</a> about our services.</li>
+            <li><a href="#">More...</a></li>
+        </ul>
+
+        <!-- ISSUE: Link with no text (icon-only with no label) -->
+        <p>❌ Icon-only links with no accessible text:</p>
+        <a href="#" style="margin:4px; font-size:20px;">🏠</a>
+        <a href="#" style="margin:4px; font-size:20px;">📧</a>
+        <a href="#" style="margin:4px; font-size:20px;">🔍</a>
+
+        <!-- ISSUE: Link that opens new window without warning -->
+        <p>❌ Link opens new window without warning:</p>
+        <a href="https://www.example.com" target="_blank">Visit Example Website</a>
+
+        <!-- ISSUE: Link styled to look like a button but not announced as button -->
+        <p>❌ Link styled as button (confusing role):</p>
+        <a href="#" style="display:inline-block; background:#0066cc; color:white; padding:8px 16px; border-radius:4px; text-decoration:none;">
+            Submit
+        </a>
+
+        <!-- ISSUE: Invisible link (same color as background) -->
+        <p>❌ Link with invisible styling:</p>
+        <p style="background:#0066cc; padding:10px;">
+            <a href="#" class="invisible-link" style="color:#0066cc;">This link is invisible against its background</a>
+        </p>
+
+        <!-- ISSUE: Empty href -->
+        <p>❌ Link with empty href (goes nowhere, purpose unclear):</p>
+        <a href="">Empty href link</a>
+
+        <!-- GOOD: Descriptive link text -->
+        <p>✅ Descriptive link text:</p>
+        <ul>
+            <li><a href="#">Read our Privacy Policy</a></li>
+            <li><a href="#">Download Q1 2026 Annual Report (PDF, 2.4MB)</a></li>
+            <li><a href="#">Learn more about our accessibility commitment</a></li>
+        </ul>
+
+        <!-- GOOD: Icon link with aria-label -->
+        <p>✅ Icon links with aria-label:</p>
+        <a href="#" aria-label="Go to Home page" style="margin:4px; font-size:20px;">🏠</a>
+        <a href="#" aria-label="Send us an Email" style="margin:4px; font-size:20px;">📧</a>
+        <a href="#" aria-label="Search the site" style="margin:4px; font-size:20px;">🔍</a>
+
+        <!-- GOOD: New window link with warning -->
+        <p>✅ Link opens new window with warning:</p>
+        <a href="https://www.example.com" target="_blank" rel="noopener noreferrer">
+            Visit Example Website <span aria-label="(opens in new tab)">(opens in new tab)</span>
+        </a>
+
+        <!-- GOOD: Skip navigation link -->
+        <p>✅ Skip navigation link (typically at top of page):</p>
+        <a href="#main-content" style="display:inline-block; padding:8px 16px; background:#0066cc; color:white; border-radius:4px; text-decoration:none;">
+            Skip to main content
+        </a>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SUMMARY / LEGEND                                             -->
+    <!-- ============================================================ -->
+    <div class="section" style="background:#f8f9fa;">
+        <h2>Summary of Issues</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Category</th>
+                    <th scope="col">WCAG SC</th>
+                    <th scope="col">Issues Count</th>
+                    <th scope="col">Level</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Color Contrast</td><td>1.4.3, 1.4.6</td><td>4 failures</td><td>AA / AAA</td></tr>
+                <tr><td>Form Labels</td><td>1.3.1, 3.3.2</td><td>6 failures</td><td>A / AA</td></tr>
+                <tr><td>ARIA Attributes</td><td>4.1.2</td><td>5 failures</td><td>A</td></tr>
+                <tr><td>Heading Structure</td><td>1.3.1, 2.4.6</td><td>3 failures</td><td>A / AA</td></tr>
+                <tr><td>Alt Text</td><td>1.1.1</td><td>5 failures</td><td>A</td></tr>
+                <tr><td>Keyboard Navigation</td><td>2.1.1</td><td>4 failures</td><td>A</td></tr>
+                <tr><td>Focus Management</td><td>2.4.7, 2.4.3</td><td>3 failures</td><td>AA / A</td></tr>
+                <tr><td>Lists</td><td>1.3.1</td><td>3 failures</td><td>A</td></tr>
+                <tr><td>Tables</td><td>1.3.1</td><td>3 failures</td><td>A</td></tr>
+                <tr><td>Links</td><td>2.4.4, 2.4.9</td><td>5 failures</td><td>A / AAA</td></tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="2">Total</th>
+                    <td colspan="2"><strong>41 intentional accessibility failures</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Hidden content for screen readers -->
+    <style>
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+
+    <!-- Main content anchor (for skip nav) -->
+    <div id="main-content"></div>
+
+    <script>
+        // Toggle functions
+        function toggleContent() {
+            const content = document.getElementById('toggle-content');
+            content.style.display = content.style.display === 'none' ? 'block' : 'none';
+            // ISSUE: No aria-expanded update
+        }
+
+        function goodToggle() {
+            const btn = document.getElementById('good-toggle-btn');
+            const content = document.getElementById('good-toggle-content');
+            const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', !isExpanded);
+            content.style.display = isExpanded ? 'none' : 'block';
+        }
+
+        // Good modal management
+        let previousFocus = null;
+
+        function openGoodModal() {
+            previousFocus = document.activeElement;
+            const modal = document.getElementById('good-modal');
+            modal.style.display = 'block';
+            document.getElementById('modal-input').focus();
+
+            // Trap focus within modal
+            modal.addEventListener('keydown', trapFocus);
+
+            // Close on Escape
+            document.addEventListener('keydown', escapeClose);
+        }
+
+        function closeGoodModal() {
+            const modal = document.getElementById('good-modal');
+            modal.style.display = 'none';
+            modal.removeEventListener('keydown', trapFocus);
+            document.removeEventListener('keydown', escapeClose);
+            if (previousFocus) previousFocus.focus();
+        }
+
+        function escapeClose(e) {
+            if (e.key === 'Escape') closeGoodModal();
+        }
+
+        function trapFocus(e) {
+            const modal = document.getElementById('good-modal');
+            const focusableElements = modal.querySelectorAll(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            const firstFocusable = focusableElements[0];
+            const lastFocusable = focusableElements[focusableElements.length - 1];
+
+            if (e.key === 'Tab') {
+                if (e.shiftKey) {
+                    if (document.activeElement === firstFocusable) {
+                        lastFocusable.focus();
+                        e.preventDefault();
+                    }
+                } else {
+                    if (document.activeElement === lastFocusable) {
+                        firstFocusable.focus();
+                        e.preventDefault();
+                    }
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
