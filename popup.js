@@ -124,7 +124,6 @@ function waitForPageReady() {
         
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
             console.log('[Page] Page already ready');
-            // Still wait a bit for dynamic content
             setTimeout(resolve, 2000);
             return;
         }
@@ -142,7 +141,6 @@ function waitForPageReady() {
             setTimeout(resolve, 2000);
         });
         
-        // Fallback timeout
         setTimeout(() => {
             console.log('[Page] Timeout reached, proceeding anyway');
             resolve();
@@ -171,21 +169,16 @@ function setupAndRunValidation() {
     // ===== DIAGNOSTIC CHECKS =====
     addDebugLog('=== DIAGNOSTIC CHECKS ===');
     
-    // Check for iframes
-    const iframes = document.querySelectorAll('iframe');
-    addDebugLog('Iframes found: ' + iframes.length);
-    
-    // Check for shadow DOM
-    const elementsWithShadow = Array.from(document.querySelectorAll('*')).filter(el => el.shadowRoot);
-    addDebugLog('Elements with shadow DOM: ' + elementsWithShadow.length);
-    
-    // Check for common interactive elements
+    // Get all elements
     const buttons = document.querySelectorAll('button, [role="button"]');
     const links = document.querySelectorAll('a');
     const inputs = document.querySelectorAll('input, textarea, select');
     const images = document.querySelectorAll('img');
     const labels = document.querySelectorAll('label');
     const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    const tables = document.querySelectorAll('table');
+    const lists = document.querySelectorAll('ul, ol, li');
+    const fieldsets = document.querySelectorAll('fieldset');
     
     addDebugLog('Interactive elements:');
     addDebugLog(`  Buttons: ${buttons.length}`);
@@ -194,12 +187,14 @@ function setupAndRunValidation() {
     addDebugLog(`  Images: ${images.length}`);
     addDebugLog(`  Labels: ${labels.length}`);
     addDebugLog(`  Headings: ${headings.length}`);
+    addDebugLog(`  Tables: ${tables.length}`);
+    addDebugLog(`  Lists: ${lists.length}`);
     
     // ===== MANUAL ACCESSIBILITY CHECKS WITH DETAILED ELEMENT INFO =====
     addDebugLog('=== MANUAL ACCESSIBILITY CHECKS ===');
     const manualViolations = [];
     
-    // Check 1: Images without alt text
+    // ===== CHECK 1: Images without alt text =====
     const imagesWithoutAlt = Array.from(images).filter(img => !img.alt || img.alt.trim() === '');
     if (imagesWithoutAlt.length > 0) {
         addDebugLog(`[VIOLATION] ${imagesWithoutAlt.length} images without alt text`);
@@ -207,29 +202,23 @@ function setupAndRunValidation() {
             id: 'image-alt-text',
             description: 'Images must have descriptive alt text',
             impact: 'critical',
-            nodes: imagesWithoutAlt.map(img => ({
-                html: img.outerHTML.substring(0, 150),
-                src: img.src || 'no src',
+            nodes: imagesWithoutAlt.map((img, i) => ({
+                src: img.src ? img.src.substring(0, 50) : 'no src',
                 class: img.className,
-                id: img.id
+                id: img.id || 'no-id'
             }))
         });
     }
     
-    // Check 2: Form inputs without labels
+    // ===== CHECK 2: Form inputs without labels =====
     const inputsWithoutLabel = Array.from(inputs).filter(input => {
-        // Check for aria-label
         if (input.getAttribute('aria-label')) return false;
-        // Check for aria-labelledby
         if (input.getAttribute('aria-labelledby')) return false;
-        // Check for associated label
         if (input.id) {
             const label = document.querySelector(`label[for="${input.id}"]`);
             if (label) return false;
         }
-        // Check for parent label
         if (input.closest('label')) return false;
-        
         return true;
     });
     
@@ -239,18 +228,16 @@ function setupAndRunValidation() {
             id: 'form-label',
             description: 'Form inputs must have associated labels',
             impact: 'critical',
-            nodes: inputsWithoutLabel.map(inp => ({
+            nodes: inputsWithoutLabel.map((inp, i) => ({
                 type: inp.type,
                 name: inp.name || 'unnamed',
                 id: inp.id || 'no-id',
-                placeholder: inp.placeholder || 'no placeholder',
-                class: inp.className,
-                html: inp.outerHTML.substring(0, 150)
+                placeholder: inp.placeholder || 'none'
             }))
         });
     }
     
-    // Check 3: Links without text
+    // ===== CHECK 3: Links without text =====
     const linksWithoutText = Array.from(links).filter(link => {
         const text = link.textContent?.trim();
         const ariaLabel = link.getAttribute('aria-label');
@@ -263,16 +250,15 @@ function setupAndRunValidation() {
             id: 'link-text',
             description: 'Links must have descriptive text',
             impact: 'serious',
-            nodes: linksWithoutText.map(link => ({
+            nodes: linksWithoutText.map((link, i) => ({
                 href: link.href || 'no href',
-                html: link.outerHTML.substring(0, 150),
                 class: link.className,
-                id: link.id
+                id: link.id || 'no-id'
             }))
         });
     }
     
-    // Check 4: Buttons without labels
+    // ===== CHECK 4: Buttons without labels =====
     const buttonsWithoutText = Array.from(buttons).filter(btn => {
         const text = btn.textContent?.trim();
         const ariaLabel = btn.getAttribute('aria-label');
@@ -285,63 +271,222 @@ function setupAndRunValidation() {
             id: 'button-label',
             description: 'Buttons must have labels',
             impact: 'serious',
-            nodes: buttonsWithoutText.map(btn => ({
+            nodes: buttonsWithoutText.map((btn, i) => ({
                 type: btn.type || 'button',
                 class: btn.className,
-                id: btn.id || 'no-id',
-                html: btn.outerHTML.substring(0, 150)
+                id: btn.id || 'no-id'
             }))
         });
     }
     
-    // Check 5: Heading structure
-    const headingLevels = new Set();
-    Array.from(headings).forEach(h => {
+    // ===== CHECK 5: Heading hierarchy violations =====
+    const headingHierarchyIssues = [];
+    let lastHeadingLevel = 0;
+    Array.from(headings).forEach((h, i) => {
         const level = parseInt(h.tagName[1]);
-        headingLevels.add(level);
-    });
-    
-    if (headingLevels.size > 0) {
-        const minLevel = Math.min(...headingLevels);
-        if (minLevel !== 1) {
-            addDebugLog(`[WARNING] Page has no H1 heading`);
-            manualViolations.push({
-                id: 'heading-h1',
-                description: 'Page should have an H1 heading',
-                impact: 'moderate',
-                nodes: [{
-                    message: 'No H1 heading found. First heading is: H' + minLevel
-                }]
+        // Check for skipped levels (e.g., H2 -> H4)
+        if (lastHeadingLevel > 0 && level > lastHeadingLevel + 1) {
+            headingHierarchyIssues.push({
+                index: i,
+                issue: `Skipped heading level: H${lastHeadingLevel} → H${level}`,
+                text: h.textContent.substring(0, 50)
             });
         }
-    } else {
-        addDebugLog(`[WARNING] Page has no headings at all`);
+        lastHeadingLevel = level;
+    });
+    
+    if (headingHierarchyIssues.length > 0) {
+        addDebugLog(`[VIOLATION] ${headingHierarchyIssues.length} heading hierarchy issues`);
         manualViolations.push({
-            id: 'heading-structure',
-            description: 'Page has no headings',
+            id: 'heading-hierarchy',
+            description: 'Heading hierarchy must be sequential (no skipped levels)',
+            impact: 'moderate',
+            nodes: headingHierarchyIssues.map((issue, i) => ({
+                message: `${i + 1}. ${issue.issue}: "${issue.text}"`
+            }))
+        });
+    }
+    
+    // ===== CHECK 6: Missing H1 or multiple H1s =====
+    const h1s = document.querySelectorAll('h1');
+    if (h1s.length === 0) {
+        addDebugLog('[VIOLATION] No H1 heading found');
+        manualViolations.push({
+            id: 'heading-h1',
+            description: 'Page must have exactly one H1 heading',
+            impact: 'moderate',
+            nodes: [{ message: 'No H1 heading found' }]
+        });
+    } else if (h1s.length > 1) {
+        addDebugLog(`[VIOLATION] ${h1s.length} H1 headings found (should be 1)`);
+        manualViolations.push({
+            id: 'multiple-h1',
+            description: 'Page should have exactly one H1 heading',
+            impact: 'moderate',
+            nodes: Array.from(h1s).map((h, i) => ({
+                message: `H1 ${i + 1}: "${h.textContent.substring(0, 50)}"`
+            }))
+        });
+    }
+    
+    // ===== CHECK 7: Semantic list issues =====
+    const fakeListDivs = Array.from(document.querySelectorAll('div')).filter(div => {
+        const text = div.textContent;
+        return /^[•\-\*]\s/.test(text) && text.length < 100 && text.split('\n').length <= 1;
+    });
+    
+    if (fakeListDivs.length > 0) {
+        addDebugLog(`[VIOLATION] ${fakeListDivs.length} fake lists using divs instead of <ul>/<ol>`);
+        manualViolations.push({
+            id: 'semantic-list',
+            description: 'Lists should use semantic <ul>/<ol> elements, not divs',
+            impact: 'moderate',
+            nodes: fakeListDivs.slice(0, 3).map((div, i) => ({
+                message: `Div ${i + 1}: "${div.textContent.substring(0, 40)}..."`
+            }))
+        });
+    }
+    
+    // ===== CHECK 8: Table structure issues =====
+    const tableIssues = [];
+    Array.from(tables).forEach((table, i) => {
+        const hasHeadRow = table.querySelector('thead');
+        const hasTh = table.querySelector('th');
+        const rows = table.querySelectorAll('tbody tr, tr');
+        
+        if (rows.length > 1 && !hasTh) {
+            tableIssues.push({
+                index: i,
+                issue: 'Table has no header row (<th> elements)'
+            });
+        }
+        
+        Array.from(table.querySelectorAll('th')).forEach(th => {
+            if (!th.getAttribute('scope') && !th.id) {
+                tableIssues.push({
+                    index: i,
+                    issue: 'Table header missing scope attribute'
+                });
+            }
+        });
+    });
+    
+    if (tableIssues.length > 0) {
+        addDebugLog(`[VIOLATION] ${tableIssues.length} table structure issues`);
+        manualViolations.push({
+            id: 'table-structure',
+            description: 'Tables must have proper headers and scope attributes',
             impact: 'serious',
-            nodes: [{
-                message: 'Page should have a logical heading structure starting with H1'
-            }]
+            nodes: tableIssues.map((issue, i) => ({
+                message: `Table ${issue.index + 1}: ${issue.issue}`
+            }))
+        });
+    }
+    
+    // ===== CHECK 9: Div/span used as button (keyboard accessibility) =====
+    const fakeButtons = Array.from(document.querySelectorAll('div[onclick], span[onclick]')).filter(el => {
+        const hasKeyHandler = el.getAttribute('onkeydown') || el.getAttribute('onkeypress');
+        const hasRole = el.getAttribute('role') === 'button';
+        return !hasKeyHandler && !hasRole;
+    });
+    
+    if (fakeButtons.length > 0) {
+        addDebugLog(`[VIOLATION] ${fakeButtons.length} div/span elements used as buttons without keyboard support`);
+        manualViolations.push({
+            id: 'keyboard-button',
+            description: 'Interactive elements must be <button> or have role="button" + keyboard handlers',
+            impact: 'serious',
+            nodes: fakeButtons.slice(0, 3).map((el, i) => ({
+                tag: el.tagName,
+                class: el.className,
+                message: `${el.tagName} ${i + 1}: "${el.textContent.substring(0, 30)}"`
+            }))
+        });
+    }
+    
+    // ===== CHECK 10: Focus outline removed =====
+    const noFocusElements = [];
+    Array.from(document.querySelectorAll('button, a, [tabindex]')).slice(0, 10).forEach(el => {
+        try {
+            const style = window.getComputedStyle(el);
+            if (style.outline === 'none' && (!style.boxShadow || style.boxShadow === 'none')) {
+                noFocusElements.push({
+                    tag: el.tagName,
+                    id: el.id || 'no-id',
+                    outline: style.outline
+                });
+            }
+        } catch (e) {
+            // Ignore errors in getComputedStyle
+        }
+    });
+    
+    if (noFocusElements.length > 0) {
+        addDebugLog(`[VIOLATION] ${noFocusElements.length} interactive elements with no visible focus indicator`);
+        manualViolations.push({
+            id: 'focus-visible',
+            description: 'Interactive elements must have visible focus indicators',
+            impact: 'serious',
+            nodes: noFocusElements.map((el, i) => ({
+                message: `${el.tag} ${i + 1}: outline="${el.outline}" (should not be none)`
+            }))
+        });
+    }
+    
+    // ===== CHECK 11: ARIA attribute issues =====
+    const ariaIssues = [];
+    Array.from(document.querySelectorAll('[aria-label], [aria-labelledby], [aria-describedby]')).forEach(el => {
+        if (el.getAttribute('aria-label') === '') {
+            ariaIssues.push({
+                element: el.tagName,
+                issue: 'Empty aria-label'
+            });
+        }
+        
+        const labelledBy = el.getAttribute('aria-labelledby');
+        if (labelledBy && !document.getElementById(labelledBy)) {
+            ariaIssues.push({
+                element: el.tagName,
+                issue: `aria-labelledby references non-existent id: "${labelledBy}"`
+            });
+        }
+        
+        const describedBy = el.getAttribute('aria-describedby');
+        if (describedBy && !document.getElementById(describedBy)) {
+            ariaIssues.push({
+                element: el.tagName,
+                issue: `aria-describedby references non-existent id: "${describedBy}"`
+            });
+        }
+    });
+    
+    if (ariaIssues.length > 0) {
+        addDebugLog(`[VIOLATION] ${ariaIssues.length} ARIA attribute issues`);
+        manualViolations.push({
+            id: 'aria-attributes',
+            description: 'ARIA attributes must reference valid IDs and not be empty',
+            impact: 'serious',
+            nodes: ariaIssues.map((issue, i) => ({
+                message: `${i + 1}. <${issue.element}>: ${issue.issue}`
+            }))
+        });
+    }
+    
+    // ===== CHECK 12: Fieldset without legend =====
+    const fieldsetIssues = Array.from(fieldsets).filter(fs => !fs.querySelector('legend'));
+    if (fieldsetIssues.length > 0) {
+        addDebugLog(`[VIOLATION] ${fieldsetIssues.length} fieldsets without legend`);
+        manualViolations.push({
+            id: 'fieldset-legend',
+            description: 'Fieldsets must have a legend element',
+            impact: 'moderate',
+            nodes: fieldsetIssues.map((fs, i) => ({
+                message: `Fieldset ${i + 1}: No legend found`
+            }))
         });
     }
     
     addDebugLog(`Manual violations found: ${manualViolations.length}`);
-    
-    // Check page color contrast (basic)
-    try {
-        const style = window.getComputedStyle(document.body);
-        const bgColor = style.backgroundColor;
-        const color = style.color;
-        addDebugLog(`Body colors - BG: ${bgColor}, Text: ${color}`);
-    } catch (e) {
-        addDebugLog('Could not get computed styles: ' + e.message);
-    }
-    
-    // Check for CSP headers
-    addDebugLog('=== CSP & SECURITY ===');
-    const cspMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
-    addDebugLog('CSP Meta tag present: ' + !!cspMeta);
     
     // Check if axe exists
     if (typeof window.axe === 'undefined') {
@@ -382,29 +527,14 @@ function setupAndRunValidation() {
                     const summary = {
                         violations: results.violations?.length || 0,
                         passes: results.passes?.length || 0,
-                        incomplete: results.incomplete?.length || 0,
-                        inapplicable: results.inapplicable?.length || 0
+                        incomplete: results.incomplete?.length || 0
                     };
                     addDebugLog('Scan completed: ' + JSON.stringify(summary));
                     
                     // Combine axe violations with manual violations
                     const allViolations = [...(results.violations || []), ...manualViolations];
                     
-                    if (allViolations.length > 0) {
-                        addDebugLog(`=== ALL VIOLATIONS FOUND (${allViolations.length}) ===`);
-                        allViolations.forEach((v, i) => {
-                            addDebugLog(`${i + 1}. ${v.id} - ${v.nodes?.length || 'multiple'} issues`);
-                        });
-                    } else {
-                        addDebugLog('No violations found');
-                    }
-                    
-                    if (results.incomplete?.length > 0) {
-                        addDebugLog('=== INCOMPLETE CHECKS (Manual Review Needed) ===');
-                        results.incomplete.forEach((v, i) => {
-                            addDebugLog(`${i + 1}. ${v.id} (${v.nodes?.length || 0} elements)`);
-                        });
-                    }
+                    addDebugLog(`=== ALL VIOLATIONS FOUND (${allViolations.length}) ===`);
                     
                     window.wcagValidationResults = {
                         violations: allViolations,
@@ -416,8 +546,7 @@ function setupAndRunValidation() {
                         pageInfo: {
                             title: document.title,
                             elementsScanned: document.querySelectorAll('*').length,
-                            readyState: document.readyState,
-                            iframes: document.querySelectorAll('iframe').length
+                            readyState: document.readyState
                         },
                         success: true,
                         debug: window.wcagDebugLogs
@@ -503,14 +632,10 @@ function waitForValidationViaMessages(tabId, timeoutMs) {
                         hasResults: !!data,
                         debugLogsCount: debug?.length || 0
                     });
-                    if (debug && debug.length > 0) {
-                        console.log('[Popup] Latest debug logs:', debug.slice(-3));
-                    }
                 }
                 
                 if (data && callbackFired && data.success !== false && pollAttempts >= 10) {
                     console.log('[Popup] ✓ Valid results found via polling on attempt', pollAttempts);
-                    console.log('[Popup] Page info:', data.pageInfo);
                     clearInterval(pollInterval);
                     chrome.runtime.onMessage.removeListener(messageListener);
                     
@@ -651,10 +776,22 @@ function createIssueElement(violation, type) {
         helpText.innerHTML = `<strong>How to fix:</strong> Ensure all buttons have visible text labels or use 'aria-label' attributes to describe their purpose.`;
     } else if (violation.id === 'image-alt-text') {
         helpText.innerHTML = `<strong>How to fix:</strong> Add descriptive alt text to all images using the 'alt' attribute. For decorative images, use alt=""`;
-    } else if (violation.id === 'heading-h1') {
+    } else if (violation.id === 'heading-h1' || violation.id === 'multiple-h1') {
         helpText.innerHTML = `<strong>How to fix:</strong> Every page should have exactly one H1 heading that describes the main purpose of the page.`;
-    } else if (violation.id === 'heading-structure') {
-        helpText.innerHTML = `<strong>How to fix:</strong> Add a logical heading structure starting with H1, followed by H2, H3, etc.`;
+    } else if (violation.id === 'heading-hierarchy') {
+        helpText.innerHTML = `<strong>How to fix:</strong> Heading levels must be sequential. After an H2, use H3; after H3, use H4. Don't skip levels.`;
+    } else if (violation.id === 'semantic-list') {
+        helpText.innerHTML = `<strong>How to fix:</strong> Use semantic list elements <code>&lt;ul&gt;</code> (unordered) or <code>&lt;ol&gt;</code> (ordered) instead of divs. Use <code>&lt;li&gt;</code> for list items.`;
+    } else if (violation.id === 'table-structure') {
+        helpText.innerHTML = `<strong>How to fix:</strong> Use <code>&lt;th&gt;</code> for headers with scope="col" or scope="row". Use <code>&lt;thead&gt;</code>, <code>&lt;tbody&gt;</code>, <code>&lt;tfoot&gt;</code> for structure.`;
+    } else if (violation.id === 'keyboard-button') {
+        helpText.innerHTML = `<strong>How to fix:</strong> Use native <code>&lt;button&gt;</code> elements or add role="button" with tabindex="0" and keyboard event handlers (Enter/Space).`;
+    } else if (violation.id === 'focus-visible') {
+        helpText.innerHTML = `<strong>How to fix:</strong> Never use outline:none without providing an alternative focus indicator. Use a 2-3px outline or box-shadow on :focus state.`;
+    } else if (violation.id === 'aria-attributes') {
+        helpText.innerHTML = `<strong>How to fix:</strong> Ensure aria-labelledby, aria-describedby, and other ARIA IDs reference existing elements. Avoid empty aria-label attributes.`;
+    } else if (violation.id === 'fieldset-legend') {
+        helpText.innerHTML = `<strong>How to fix:</strong> Wrap related form inputs in a <code>&lt;fieldset&gt;</code> and provide a descriptive <code>&lt;legend&gt;</code> element.`;
     }
 
     el.appendChild(title);
@@ -705,9 +842,8 @@ function createIssueElement(violation, type) {
                 if (node.id) content += `id="${node.id}" `;
                 if (node.name) content += `name="${node.name}" `;
                 if (node.type) content += `type="${node.type}"`;
-                if (node.href) content += `href="${node.href}"`;
-            } else if (node.src) {
-                content = `${index + 1}. src="${node.src}"`;
+                if (node.href) content += `href="${node.href.substring(0, 30)}"`;
+                if (node.src) content += `src="${node.src}"`;
             } else {
                 content = `${index + 1}. ${JSON.stringify(node).substring(0, 80)}`;
             }
