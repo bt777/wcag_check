@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WCAG 2.1 AA Validation Report</title>
+    <link rel="stylesheet" href="report.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>WCAG 2.1 AA Validation Report</h1>
+            <p id="url" class="url">Loading...</p>
+            <p id="timestamp" class="timestamp">Loading...</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="violations">Issues</button>
+            <button class="tab-btn" data-tab="incomplete">Needs Review</button>
+            <button class="tab-btn" data-tab="passes">Passed</button>
+        </nav>
+
+        <div id="violations" class="tab-content active">
+            <h2>Violations (Critical Issues)</h2>
+            <div id="violationsList"></div>
+        </div>
+
+        <div id="incomplete" class="tab-content">
+            <h2>Needs Manual Review</h2>
+            <div id="incompleteList"></div>
+        </div>
+
+        <div id="passes" class="tab-content">
+            <h2>Passed Checks</h2>
+            <div id="passesList"></div>
+        </div>
+    </div>
+
+    <script src="report.js"></script>
+</body>
+</html>
